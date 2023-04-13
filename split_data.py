@@ -10,12 +10,23 @@ def main():
     parser = argparse.ArgumentParser(description="Generate train & valid csvs from dataset directories")
 
     parser.add_argument('--root_path', default=None, type=str)
+    parser.add_argument('--wavlist_path', default=None, type=str) 
     parser.add_argument('--sc09_only', default=False, type=bool, help="Include only paths from digits in train/valid/test.")
+
+    print("start processing")
 
     args = parser.parse_args()
     sc09_only = bool(args.sc09_only)
     rp = Path(args.root_path)
-    all_files = list(rp.rglob('**/*.wav'))
+    if args.wavlist_path is not None:
+        all_files = []
+        with open(args.wavlist_path, "r") as f:
+            for l in f.readlines():
+                all_files.append(Path(l.strip()))
+    else: all_files = list(rp.rglob('**/*.wav'))
+    
+    print(len(all_files))
+    
     rel_files = [f.relative_to(rp) for f in all_files]
     if sc09_only:
         n_pre = len(rel_files)
